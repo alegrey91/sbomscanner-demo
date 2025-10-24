@@ -1,0 +1,7 @@
+apiVersion: sbomscanner.kubewarden.io/v1alpha1
+kind: VEXHub
+metadata:
+  name: aquasec-vexhub
+spec:
+  url: "https://github.com/aquasecurity/vexhub"
+  enabled: true
