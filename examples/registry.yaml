@@ -6,6 +6,8 @@ metadata:
 spec:
   uri: dev-registry.default.svc.cluster.local:5000
   catalogType: OCIDistribution
+  repositories:
+    - name: test-image
   platforms:
     - arch: "amd64"
       os: "linux"

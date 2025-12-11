@@ -41,7 +41,7 @@ func scanDemo() *demo.Run {
 	r.Step(demo.S(
 		"Ensure the image was pushed properly",
 	), demo.S(
-		"curl -X GET http://localhost:5000/v2/_catalog",
+		"curl -X GET http://localhost:5000/v2/_catalog | jq",
 	))
 
 	// Step 3: Check registry manifest
@@ -117,15 +117,14 @@ func scanDemo() *demo.Run {
 	r.Step(demo.S(
 		"Show the vulnerability report resource",
 	), demo.S(
-		"kubectl get vulnerabilityreport c8f387632342cf9b250ffe9db03a87d1b2cbbf4bbdb231e02fc10faabd537453 -o yaml | less",
+		"kubectl get vulnerabilityreports -o=jsonpath='{.items[0].report.summary}' | jq",
 	))
 
-	// Step 14: Count vulnerabilities (without VEX)
+	// Step 14: Show SBOM details
 	r.Step(demo.S(
-		"Count vulnerabilities without VEX status (baseline)",
+		"Show the VulnerabilityReport resource",
 	), demo.S(
-		"kubectl get vulnerabilityreport c8f387632342cf9b250ffe9db03a87d1b2cbbf4bbdb231e02fc10faabd537453 -o yaml |",
-		"  yq '[.report.results[].vulnerabilities[] | select( has(\"vexStatus\") | not )] | length'",
+		"kubectl get vulnerabilityreport c8f387632342cf9b250ffe9db03a87d1b2cbbf4bbdb231e02fc10faabd537453 -o yaml | less",
 	))
 
 	// Step 15: Delete scanjob
@@ -172,27 +171,18 @@ func scanDemo() *demo.Run {
 		"kubectl apply -f examples/scanjob.yaml",
 	))
 
-	// Step 21: Verify vulnerability report (with VEX)
+	// Step 21: Show SBOM details
 	r.Step(demo.S(
-		"List vulnerability reports after VEX integration",
+		"Show the VulnerabilityReport resource",
 	), demo.S(
-		"kubectl get vulnerabilityreports",
+		"kubectl get vulnerabilityreport c8f387632342cf9b250ffe9db03a87d1b2cbbf4bbdb231e02fc10faabd537453",
 	))
 
 	// Step 22: Show vulnerability report (with VEX)
 	r.Step(demo.S(
 		"Show the vulnerability report with VEX status",
 	), demo.S(
-		"kubectl get vulnerabilityreport c8f387632342cf9b250ffe9db03a87d1b2cbbf4bbdb231e02fc10faabd537453 -o yaml | less",
-	))
-
-	// Step 23: Count vulnerabilities (with VEX)
-	r.Step(demo.S(
-		"Count remaining vulnerabilities after VEX filtering",
-		"Compare this number with the baseline count",
-	), demo.S(
-		"kubectl get vulnerabilityreport c8f387632342cf9b250ffe9db03a87d1b2cbbf4bbdb231e02fc10faabd537453 -o yaml |",
-		"  yq '[.report.results[].vulnerabilities[] | select( has(\"vexStatus\") | not )] | length'",
+		"kubectl get vulnerabilityreports -o=jsonpath='{.items[0].report.summary}' | jq",
 	))
 
 	return r
